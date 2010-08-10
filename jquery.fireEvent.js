@@ -1,7 +1,4 @@
-/*
-	jQuery.fireEvent v0.1
-*/
- (function($, undefined) {
+(function($, undefined) {
 
 	$.fireEvent = function(el, eventName, opt) {
 		if (el === undefined)
