@@ -1,53 +1,110 @@
-(function($){
-	
-	$.fn.fireEvent = function(eventName,opt){
-		console.debug(this);
-		var el = this[0];
-	
-		//Inspired from: https://developer.mozilla.org/en/DOM/document.createEvent
-		if(document.dispatchEvent) { // W3C
-		    var oEvent = document.createEvent(fireEvent_p[eventName].ce);
-		    fireEvent_p[eventName].initEvt(oEvent,el,opt);
-		    el.dispatchEvent( oEvent );
-		    }
-		else if(document.fireEvent){ // IE
-		    el.fireEvent(fireEvent_p[eventName].ie);
-		}
-		
-		return this;
-	};
+/*
+	jQuery.fireEvent v0.1
+*/
+(function($, undefined) {
 
-var fireEvent_p = {
-	'click':{
-		ce:'MouseEvents',
-		initEvt:function(evt, target){
-			evt.initMouseEvent('click', true, true, window, 1, 1, 1, 1, 1, false, false, false, false, 0, target);
-		},
-		ie:'onclick'
-	},
-	'keyup':{
-		ce:'KeyboardEvent',
-		initEvt:function(evt, target,opt){
-			evt.initKeyEvent('keyup', true, true, window, 
-                        false, false, false, false, 
-                        opt.keyCode, opt.CharCode) 
-		},
-		ie:'onkeyup'
-	},
-	'blur':{
-		ce:'HTMLEvents',
-		initEvt:function(evt, target){
-			evt.initEvent('blur', true, true); 
-		},
-		ie:'onblur'
-	},
-	'change':{
-		ce:'HTMLEvents',
-		initEvt:function(evt, target){
-			evt.initEvent('change', true, true); 
-		},
-		ie:'onchange'
-	}	
-};
+    $.fireEvent = function(el, eventName, opt) {
+        if (el === undefined)
+        	return false;
+		
+		var createEvent, evt;
+		
+		if(el.ownerDocument && el.ownerDocument.createEvent){
+			evt = el.ownerDocument.createEvent(evts[eventName].w3c);
+		}else {
+			evt = document.createEvent(evts[eventName].w3c);
+		}
+			
+		evts[eventName].initEvt(evt, el, opt);
+		
+        if (document.dispatchEvent) {// W3C    
+            el.dispatchEvent(evt);
+        }
+        else if (document.fireEvent) {// IE
+            el.fireEvent(evts[eventName].ie,evt);
+        }
+    };
+
+    $.fn.fireEvent = function(eventName, opt) {
+        if (this.length == 0)
+        	return this;
+
+        $.fireEvent.call({},
+        this[0], eventName, opt);
+
+        return this;
+    };
+
+    /* -- Event cross-browser implementation -- */
+    var evts = {
+        'click': {
+            ie: 'onclick',
+            w3c: 'MouseEvents',
+            initEvt: function(evt, target, opt) {
+                //default value
+                var _def = $.extend({
+                    type: 'click',
+                    canBubble: true,
+                    cancelable: true,
+                    view: window,
+                    detail: 1,
+                    screenX: 1,
+                    screenY: 1,
+                    clientX: 1,
+                    clientY: 1,
+                    ctrlKey: false,
+                    altKey: false,
+                    shiftKey: false,
+                    metaKey: false,
+                    button: 0,
+                    relatedTarget: target
+                },
+                opt);
+
+                evt.initMouseEvent(_def.type,
+                _def.canBubble, _def.cancelable, _def.view, _def.detail,
+                _def.screenX, _def.screenY, _def.clientX, _def.clientY,
+                _def.ctrlKey, _def.altKey, _def.shiftKey, _def.metaKey, _def.button, _def.relatedTarget);
+            }
+        },
+
+        'dblclick': {
+            ie: 'ondblclick',
+            w3c: 'MouseEvents',
+            initEvt: function(evt, target, opt) {
+                evts['click'].initEvt(evt, target, $.extend({type:'dblclick'},opt));
+            }
+        },
+
+        'keyup': {
+            ie: 'onkeyup',
+            w3c: 'KeyboardEvent',
+            initEvt: function(evt, target, opt) {
+				var _def = $.extend({
+					keyCode:null,
+					CharCode:null},opt);
+					
+                evt.initKeyEvent('keyup', true, true, window,
+                false, false, false, false,_def.keyCode, _def.CharCode)
+            }
+
+        },
+        'blur': {
+            ie: 'onblur',
+            w3c: 'HTMLEvents',
+            initEvt: function(evt, target, opt) {
+                evt.initEvent('blur', true, true);
+            }
+
+        },
+        'change': {
+            ie: 'onchange',
+            w3c: 'HTMLEvents',
+            initEvt: function(evt, target, opt) {
+                evt.initEvent('change', true, true);
+            }
+
+        }
+    };
 
 })(jQuery);
