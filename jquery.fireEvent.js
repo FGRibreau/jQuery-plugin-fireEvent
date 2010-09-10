@@ -1,24 +1,39 @@
+/*
+  jQuery-fireEvent v0.2, by Francois-Guillaume Ribreau.
+
+  http://blog.fgribreau.com/2010/08/jquery-fireevent-plugin-for-firing-real.html
+
+  Copyright (c)2010 Francois-Guillaume Ribreau. All rights reserved.
+  Released under the Creative Commons BY-SA Conditions.
+    http://creativecommons.org/licenses/by-sa/3.0/
+
+  Usage:
+    $('#button').fireEvent('click').text('Event sent');
+*/
+
 (function($, undefined) {
 
 	$.fireEvent = function(el, eventName, opt) {
 		if (el === undefined)
 			return false;
+		
+		if('jquery' in el){
+		  el = el[0];
+		}
 
-		var evt;
-
-		if (el.ownerDocument && el.ownerDocument.createEvent) {
-			evt = el.ownerDocument.createEvent(evts[eventName].w3c);
-		} else {
+    if(!evts[eventName]){
+			return false;
+    }
+    
+    var evt;
+    
+		if (typeof(document.createEvent) != 'undefined') {//W3C way
 			evt = document.createEvent(evts[eventName].w3c);
-		}
-
-		evts[eventName].initEvt(evt, el, opt);
-
-		if (document.dispatchEvent) {// W3C
+			evts[eventName].initEvt(evt, el, opt);
 			el.dispatchEvent(evt);
-		}
-		else if (document.fireEvent) {// IE
-			el.fireEvent(evts[eventName].ie, evt);
+
+		} else {//IE
+			el.fireEvent(evts[eventName].ie, evt || null);
 		}
 	};
 
@@ -33,7 +48,7 @@
 
 	/* -- Event cross-browser implementation -- */
 	var evts = {
-		'click': {
+		'click': {//Tested/Work with Firefox 3.6 & Safari 5.0.1 & Chromium 6.0
 			ie: 'onclick',
 			w3c: 'MouseEvents',
 			initEvt: function(evt, target, opt) {
@@ -61,7 +76,7 @@
 			}
 		},
 
-		'dblclick': {
+		'dblclick': {//Tested/Work with Firefox 3.6 & Safari 5.0.1 & Chromium 6.0
 			ie: 'ondblclick',
 			w3c: 'MouseEvents',
 			initEvt: function(evt, target, opt) {
@@ -69,17 +84,18 @@
 			}
 		},
 
-		'keyup': {
+		'keyup': {//Tested/Work with Firefox 3.6 & Safari 5.0.1 & Chromium 6.0 (not opera)
 			ie: 'onkeyup',
 			w3c: 'KeyboardEvent',
 			initEvt: function(evt, target, opt) {
 				var _def = $.extend({keyCode: null, CharCode: null}, opt);
-
-				evt.initKeyEvent('keyup', true, true, window, false, false, false, false, _def.keyCode, _def.CharCode)
+        //initKeyboardEvent doesn't work with Opera (tested with Firefox 3.6 & Safari 5.0.1)
+				evt.initKeyboardEvent('keyup', true, true, window, false, false, false, false, _def.keyCode, _def.CharCode)
 			}
 
 		},
-		'blur': {
+		
+		'blur': {//Tested/Work with Firefox 3.6 & Safari 5.0.1 & Chromium 6.0
 			ie: 'onblur',
 			w3c: 'HTMLEvents',
 			initEvt: function(evt, target, opt) {
@@ -87,7 +103,8 @@
 			}
 
 		},
-		'change': {
+		
+		'change': {//Tested/Work with Firefox 3.6 & Safari 5.0.1 & Chromium 6.0
 			ie: 'onchange',
 			w3c: 'HTMLEvents',
 			initEvt: function(evt, target, opt) {

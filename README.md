@@ -1,4 +1,4 @@
-jQuery FireEvent - Plugin for firing real DOM events
+jQuery FireEvent - Plugin for firing real DOM cross-browser events
 ================================
 
 Usage
