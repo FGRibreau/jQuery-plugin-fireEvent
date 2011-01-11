@@ -34,7 +34,7 @@
 
 		} else {//IE
 			if (eventName == 'click') { 
-				// we use jquery to fire the click event because of a bug
+				// we use jquery to fire the click event because of a bug in IE7-8
 				$(el).click();
 			} else {
 				el.fireEvent(evts[eventName].ie);
