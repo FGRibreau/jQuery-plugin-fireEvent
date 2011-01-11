@@ -33,7 +33,12 @@
 			el.dispatchEvent(evt);
 
 		} else {//IE
-			el.fireEvent(evts[eventName].ie, evt || null);
+			if (eventName == 'click') { 
+				// we use jquery to fire the click event because of a bug
+				$(el).click();
+			} else {
+				el.fireEvent(evts[eventName].ie);
+			}
 		}
 	};
 
