@@ -1,4 +1,4 @@
-jQuery FireEvent - Plugin for firing real DOM cross-browser events
+jQuery FireEvent - Plugin for firing real DOM cross-browser events [![Gittip](http://badgr.co/gittip/fgribreau.png)](https://www.gittip.com/fgribreau/)
 ================================
 
 Usage
