@@ -7,3 +7,6 @@ Usage
 	$('#el').fireEvent('click',{button:1});
 	//or
 	$.fireEvent(document.getElementById('el'),'click',{button:1});
+
+## Donate
+[Donate Bitcoins](https://coinbase.com/checkouts/fc3041b9d8116e0b98e7d243c4727a30)
